@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
       io.emit("session", "start");
       interval = setInterval(() => {
         io.emit("session", "start");
-      }, Number(speed * 4));
+      }, Number(speed));
     }
     if (arg === "stop") {
       console.log(123);
