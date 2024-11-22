@@ -12,6 +12,8 @@ const io = new Server(server, {
   },
 });
 
+let session = false;
+
 app.get("/", (req, res) => {
   res.sendFile(join(__dirname, "index.html"));
 });
@@ -20,13 +22,21 @@ io.on("connection", (socket) => {
   socket.on("session", (arg) => {
     //Start
     if (arg === "start") {
+      session = true;
       io.emit("session", "start");
     }
     //Stop
     if (arg === "stop") {
+      session = false;
       io.emit("session", "stop");
     }
   });
+  if (session) {
+    io.emit("session", "start");
+  }
+  if (!session) {
+    io.emit("session", "stop");
+  }
 });
 
 server.listen(8000, () => {
