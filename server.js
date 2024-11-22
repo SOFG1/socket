@@ -3,10 +3,6 @@ const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const { join } = require("node:path");
 
-let newSpeed = "3000";
-let speed = "3000";
-let interval;
-
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -21,28 +17,15 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  //Session
   socket.on("session", (arg) => {
+    //Start
     if (arg === "start") {
-      if (speed !== newSpeed) {
-        clearInterval(interval);
-        speed = newSpeed;
-      }
       io.emit("session", "start");
-      interval = setInterval(() => {
-        io.emit("session", "start");
-      }, Number(speed));
     }
+    //Stop
     if (arg === "stop") {
-      console.log(123);
       io.emit("session", "stop");
-      clearInterval(interval);
     }
-  });
-  //Settings
-  socket.on("settings", (arg) => {
-    newSpeed = arg.speed;
-    io.emit("settings", arg);
   });
 });
 
