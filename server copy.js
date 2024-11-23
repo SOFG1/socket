@@ -1,43 +1,24 @@
 const express = require("express");
-const { createServer } = require("node:http");
-const { Server } = require("socket.io");
-const { join } = require("node:path");
+const http = require("http");
+const socketIo = require("socket.io");
 
 const app = express();
-const server = createServer(app);
-const io = new Server(server, {
+const server = http.createServer(app);
+const io = socketIo(server, {
   cors: {
     origin: "*", // Allow all origins for development (adjust as needed)
     methods: ["GET", "POST"],
   },
 });
 
-let session = false;
-
 app.get("/", (req, res) => {
-  res.sendFile(join(__dirname, "index.html"));
+  res.send("Signaling server is running");
 });
 
 io.on("connection", (socket) => {
-  socket.on("session", (arg) => {
-    //Start
-    if (arg === "start") {
-      session = true;
-      io.emit("session", "start");
-    }
-    //Stop
-    if (arg === "stop") {
-      session = false;
-      io.emit("session", "stop");
-    }
-  });
-  if (session) {
-    io.emit("session", "start");
-  }
-  if (!session) {
-    io.emit("session", "stop");
-  }
-  // WebRTC below
+  console.log("New connection: ", socket.id);
+
+  // Handle signaling messages (offer, answer, ICE candidates)
   socket.on("offer", (data) => {
     console.log("Offer received:", data);
     socket.broadcast.emit("offer", data); // Send offer to other peer
@@ -52,8 +33,12 @@ io.on("connection", (socket) => {
     console.log("ICE Candidate received:", data);
     socket.broadcast.emit("ice-candidate", data); // Send ICE candidate to other peer
   });
+
+  socket.on("disconnect", () => {
+    console.log("Disconnected:", socket.id);
+  });
 });
 
-server.listen(8000, () => {
-  console.log("server running at http://localhost:3000");
+server.listen(3000, () => {
+  console.log("Signaling server listening on port 3000");
 });
