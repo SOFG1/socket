@@ -37,6 +37,10 @@ io.on("connection", (socket) => {
   if (!session) {
     io.emit("session", "stop");
   }
+  //Connect mobile device
+  socket.on("device", (d) => {
+    io.emit("device", d);
+  });
   // WebRTC below
   socket.on("offer", (data) => {
     console.log("Offer received:", data);
