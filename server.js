@@ -27,6 +27,10 @@ io.on("connection", (socket) => {
       io.emit("session", "stop");
     }
   });
+  //Settings
+  socket.on("settings", (d) => {
+    io.emit("settings", d);
+  });
   //Connect mobile device
   socket.on("device", (d) => {
     io.emit("device", d);
