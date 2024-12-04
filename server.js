@@ -17,6 +17,19 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  //List
+  const arr = Array.from(io.sockets.sockets.keys());
+  io.emit("connection-started", arr);
+   // Handle disconnect
+   socket.on("disconnect", () => {
+    const arr = Array.from(io.sockets.sockets.keys());
+    io.emit("connection-started", arr);
+    console.log(`User disconnected: ${socket.id}`);
+  });
+  ///////////////////////////////////////////////
+  ///////////////////////////////////////
+  ///////////////////////////////
+  //Session
   socket.on("session", (arg) => {
     //Start
     if (arg === "start") {
@@ -37,7 +50,7 @@ io.on("connection", (socket) => {
   });
   //Signal
   socket.on("signal", (d) => {
-    socket.broadcast.emit("signal", d)
+    socket.broadcast.emit("signal", d);
   });
   // WebRTC below
   socket.on("offer", (data) => {
@@ -54,6 +67,8 @@ io.on("connection", (socket) => {
     console.log("ICE Candidate received:", data);
     socket.broadcast.emit("ice-candidate", data); // Send ICE candidate to other peer
   });
+
+ 
 });
 
 server.listen(3000, () => {
