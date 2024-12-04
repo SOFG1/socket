@@ -35,6 +35,10 @@ io.on("connection", (socket) => {
   socket.on("device", (d) => {
     io.emit("device", d);
   });
+  //Signal
+  socket.on("signal", (d) => {
+    socket.broadcast.emit("signal", d)
+  });
   // WebRTC below
   socket.on("offer", (data) => {
     console.log("Offer received:", data);
